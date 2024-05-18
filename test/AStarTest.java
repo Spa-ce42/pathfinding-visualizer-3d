@@ -69,10 +69,8 @@ public class AStarTest extends PFV {
                 CubeRenderer.drawCube(new Vector3f(0, 0, 1), new Matrix4f().translate(v.x, v.y, v.z));
             }
 
-            CubeRenderer.end();
-            end();
 
-            delay(40);
+            delay(30);
 
             if(point.equals(end)) {
                 this.fullPath = this.reconstructPath(cameFrom, point);
@@ -81,11 +79,7 @@ public class AStarTest extends PFV {
 
             closedSet.add(point);
             for(Vector3i neighbor : space.getNeighbors(point)) {
-                begin();
-                CubeRenderer.begin(this.camera);
-                CubeRenderer.drawCube(new Vector3f(0, 1, 0), new Matrix4f().translate(neighbor.x, neighbor.y, neighbor.z));
-                CubeRenderer.end();
-                end();
+                CubeRenderer.drawCube(new Vector3f(1, 0.6f, 0.02f), new Matrix4f().translate(neighbor.x, neighbor.y, neighbor.z));
                 if(closedSet.contains(neighbor)) {
                     continue;
                 }
@@ -101,6 +95,9 @@ public class AStarTest extends PFV {
 
                 cameFrom.put(neighbor, point);
             }
+
+            CubeRenderer.end();
+            end();
         }
     }
 
@@ -109,14 +106,16 @@ public class AStarTest extends PFV {
         List<Vector3i> starts = this.space.starts();
         List<Vector3i> ends = this.space.ends();
 
-        for(int i = 0, n = starts.size(); i < n; ++i) {
-            pathFind(starts.get(i), ends.get(i));
+        while(true) {
+            for(int i = 0, n = starts.size(); i < n; ++i) {
+                pathFind(starts.get(i), ends.get(i));
 
-            long goal = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(1000);
-            while(System.nanoTime() < goal) {
-                begin();
-                this.stable();
-                end();
+                long goal = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(1000);
+                while(System.nanoTime() < goal) {
+                    begin();
+                    this.stable();
+                    end();
+                }
             }
         }
     }
