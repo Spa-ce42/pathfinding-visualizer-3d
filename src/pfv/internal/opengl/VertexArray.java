@@ -1,4 +1,4 @@
-package pfv.internal;
+package pfv.internal.opengl;
 
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
@@ -33,5 +33,13 @@ public class VertexArray {
 
     public void unbind() {
         glBindVertexArray(0);
+    }
+
+    public void dispose() {
+        for(VertexBuffer vb : vertexBuffers) {
+            vb.dispose();
+        }
+
+        this.indexBuffer.dispose();
     }
 }
