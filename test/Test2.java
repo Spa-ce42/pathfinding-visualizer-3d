@@ -11,10 +11,14 @@ import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glGetError;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 
 import java.nio.DoubleBuffer;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 import pfv.internal.CubeRenderer;
 import pfv.internal.Layer;
@@ -67,7 +71,7 @@ public class Test2 implements Layer {
         float cpyo = cursorPosY - cpy;
 
         camera.addYaw(cpxo * 0.01f);
-        camera.addPitch(-cpyo * 0.01f);
+        camera.addPitch(cpyo * 0.01f);
         camera.updateCameraVectors();
 
         if(glfwGetKey(window.getNativeWindow(), GLFW_KEY_W) == GLFW_PRESS) {
@@ -99,13 +103,15 @@ public class Test2 implements Layer {
 
     @Override
     public void onUpdate(float ts) {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         Window window = pfv.getWindow();
         processInput(window, camera);
         window.setTitle("Pathfinding Visualizer: " + camera.getPosition() + "(" + camera.getYaw() + ", " + camera.getPitch() + ")");
 
         CubeRenderer.begin(camera);
+        for(int i = 0; i < 50; ++i) {
+            CubeRenderer.drawCube(new Vector3f(0.8f, 0.2f, 0.3f), new Matrix4f().translate(i, 0, 0));
+        }
         CubeRenderer.end();
     }
 
@@ -118,8 +124,8 @@ public class Test2 implements Layer {
         Test2 test2 = new Test2();
         pfv = new PFV(test2);
         WindowProperties wp = new WindowProperties();
-        wp.setWidth(1280 * 2);
-        wp.setHeight(720 * 2);
+        wp.setWidth(1280);
+        wp.setHeight(720);
         wp.setTitle("Pathfinding Visualizer");
         wp.setVsync(false);
         pfv.initialize(wp);

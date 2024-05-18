@@ -8,7 +8,7 @@ import java.util.List;
 
 public class VertexArray {
     private final int handle;
-    private List<VertexBuffer> vertexBuffers;
+    private final List<VertexBuffer> vertexBuffers;
     private IndexBuffer indexBuffer;
 
     public VertexArray() {

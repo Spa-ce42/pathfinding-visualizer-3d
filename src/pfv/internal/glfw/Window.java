@@ -66,8 +66,8 @@ public class Window {
         this.height = wp.getHeight();
         this.setVsync(wp.isVsync());
 
-
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+
         GLFWStates.initialize();
         GLFWVidMode gvm = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
