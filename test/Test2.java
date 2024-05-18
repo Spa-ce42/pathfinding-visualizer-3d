@@ -1,51 +1,22 @@
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
-import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
-import static org.lwjgl.glfw.GLFW.glfwGetCursorPos;
-import static org.lwjgl.glfw.GLFW.glfwGetKey;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glGetError;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-
-import java.nio.DoubleBuffer;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.PriorityQueue;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.lwjgl.system.MemoryStack;
-import pfv.internal.CubeRenderer;
-import pfv.internal.Layer;
-import pfv.internal.PerspectiveCamera;
+import org.joml.Vector3i;
+import pfv.PointInformation;
+import pfv.Space;
 import pfv.internal.WindowProperties;
-import pfv.internal.event.Event;
-import pfv.internal.event.Input;
-import pfv.internal.glfw.Window;
-import pfv.internal.opengl.IndexBuffer;
-import pfv.internal.opengl.Shader;
-import pfv.internal.opengl.VertexArray;
-import pfv.internal.opengl.VertexBuffer;
+import pfv.internal.render.CubeRenderer;
 
-public class Test2 implements Layer {
-    private static PFV pfv;
-    private PerspectiveCamera camera;
-    private Shader shader;
-    private VertexArray va;
-    private float cursorPosX;
-    private float cursorPosY;
-
+public class Test2 extends PFV {
     @Override
     public void onAttach() {
-        Window window = pfv.getWindow();
-
-        camera = new PerspectiveCamera((float)window.getWidth() / window.getHeight());
-        camera.addPosition(0, 0, -3);
+        super.space = new Space(new File("beesetup3.txt"));
     }
 
     @Override
@@ -53,82 +24,99 @@ public class Test2 implements Layer {
 
     }
 
-    private void getCursorPos(Window window) {
-        try(MemoryStack stack = MemoryStack.stackPush()) {
-            DoubleBuffer x = stack.mallocDouble(1);
-            DoubleBuffer y = stack.mallocDouble(1);
-            glfwGetCursorPos(window.getNativeWindow(), x, y);
-            cursorPosX = (float)x.get(0);
-            cursorPosY = (float)y.get(0);
+
+    private List<Vector3i> reconstructPath(HashMap<Vector3i, Vector3i> cameFrom, Vector3i current) {
+        List<Vector3i> totalPath = new ArrayList<>();
+        totalPath.add(current);
+
+        while(cameFrom.containsKey(current)) {
+            current = cameFrom.get(current);
+
+            if(totalPath.contains(current)) {
+                continue;
+            }
+
+            totalPath.add(current);
         }
+
+        Collections.reverse(totalPath);
+
+        return totalPath;
     }
 
-    private void processInput(Window window, PerspectiveCamera camera) {
-        float cpx = cursorPosX;
-        float cpy = cursorPosY;
-        getCursorPos(window);
-        float cpxo = cursorPosX - cpx;
-        float cpyo = cursorPosY - cpy;
+    private List<Vector3i> fullPath;
 
-        camera.addYaw(cpxo * 0.01f);
-        camera.addPitch(cpyo * 0.01f);
-        camera.updateCameraVectors();
+    @Override
+    public void run() {
+        Vector3i start = this.space.starts().getFirst();
+        Vector3i end = this.space.ends().getFirst();
+        PriorityQueue<PointInformation> openSet = new PriorityQueue<>();
+        openSet.add(new PointInformation(start, start, end));
+        HashMap<Vector3i, Vector3i> cameFrom = new HashMap<>();
+        HashSet<Vector3i> closedSet = new HashSet<>();
 
-        if(glfwGetKey(window.getNativeWindow(), GLFW_KEY_W) == GLFW_PRESS) {
-            camera.addPosition(camera.getFront().mul(0.01f));
-        }
+        PointInformation pInfo = null;
+        while(!openSet.isEmpty()) {
 
-        if(glfwGetKey(window.getNativeWindow(), GLFW_KEY_S) == GLFW_PRESS) {
-            camera.addPosition(camera.getFront().mul(-0.01f));
-        }
+            pInfo = openSet.poll();
+            Vector3i point = pInfo.point;
 
-        if(glfwGetKey(window.getNativeWindow(), GLFW_KEY_A) == GLFW_PRESS) {
-            camera.addPosition(camera.getFront().cross(camera.getUp()).normalize().mul(-0.01f));
-        }
+            begin();
+            CubeRenderer.begin(this.camera);
 
-        if(glfwGetKey(window.getNativeWindow(), GLFW_KEY_D) == GLFW_PRESS) {
-            camera.addPosition(camera.getFront().cross(camera.getUp()).normalize().mul(0.01f));
-        }
+            for(Vector3i v : reconstructPath(cameFrom, point)) {
+                CubeRenderer.drawCube(new Vector3f(1, 1, 1), new Matrix4f().translate(v.x, v.y, v.z));
+            }
 
-        Input input = Input.getInput();
+            CubeRenderer.end();
+            end();
 
-        if(input.isKeyPressed0(GLFW_KEY_SPACE)) {
-            camera.addPosition(0, 0.01f, 0);
-        }
+            delay(25);
 
-        if(input.isKeyPressed0(GLFW_KEY_LEFT_SHIFT)) {
-            camera.addPosition(0, -0.01f, 0);
+            if(point.equals(end)) {
+                this.fullPath = this.reconstructPath(cameFrom, point);
+                return;
+            }
+
+            closedSet.add(point);
+            for(Vector3i neighbor : space.getNeighbors(point)) {
+                if(closedSet.contains(neighbor)) {
+                    continue;
+                }
+
+                PointInformation nInfo = new PointInformation(start, neighbor, end);
+                double tentativeGCost = pInfo.g + point.distance(neighbor);
+
+                if(!openSet.contains(nInfo)) {
+                    openSet.add(nInfo);
+                } else if(tentativeGCost >= nInfo.g) {
+                    continue;
+                }
+
+                cameFrom.put(neighbor, point);
+            }
         }
     }
 
     @Override
-    public void onUpdate(float ts) {
+    public void stable() {
+        CubeRenderer.begin(super.camera);
 
-        Window window = pfv.getWindow();
-        processInput(window, camera);
-        window.setTitle("Pathfinding Visualizer: " + camera.getPosition() + "(" + camera.getYaw() + ", " + camera.getPitch() + ")");
-
-        CubeRenderer.begin(camera);
-        for(int i = 0; i < 50; ++i) {
-            CubeRenderer.drawCube(new Vector3f(0.8f, 0.2f, 0.3f), new Matrix4f().translate(i, 0, 0));
+        for(Vector3i v : this.fullPath) {
+            CubeRenderer.drawCube(new Vector3f(1, 1, 1), new Matrix4f().translate(v.x, v.y, v.z));
         }
+
         CubeRenderer.end();
     }
 
-    @Override
-    public void onEvent(Event e) {
-
-    }
-
     public static void main(String[] args) {
-        Test2 test2 = new Test2();
-        pfv = new PFV(test2);
+        PFV pfv = new Test2();
         WindowProperties wp = new WindowProperties();
-        wp.setWidth(1280);
-        wp.setHeight(720);
-        wp.setTitle("Pathfinding Visualizer");
+        wp.setWidth(1280 * 2);
+        wp.setHeight(720 * 2);
+        wp.setTitle("Pathfinding Visualizer (Hold left alt to make cursor visible)");
         wp.setVsync(false);
         pfv.initialize(wp);
-        pfv.run();
+        pfv.start();
     }
 }

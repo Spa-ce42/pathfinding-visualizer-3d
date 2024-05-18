@@ -1,13 +1,8 @@
-package pfv.internal;
+package pfv.internal.render;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL31.glDrawElementsInstanced;
@@ -18,6 +13,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.system.MemoryUtil;
+import pfv.internal.PerspectiveCamera;
 import pfv.internal.opengl.IndexBuffer;
 import pfv.internal.opengl.Shader;
 import pfv.internal.opengl.VertexArray;
@@ -45,7 +41,6 @@ public class CubeRenderer {
             va.dispose();
         }
 
-        glEnable(GL_DEPTH_TEST);
         CubeRenderer.maxCount = count;
         va = new VertexArray();
 
@@ -165,8 +160,6 @@ public class CubeRenderer {
     }
 
     public static void end() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         shader.bind();
         shader.setMatrix4f("u_View", pc.getView());
         shader.setMatrix4f("u_Projection", pc.getProjection());

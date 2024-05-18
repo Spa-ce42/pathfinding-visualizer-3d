@@ -15,33 +15,33 @@ public class Input {
         this.window = window;
     }
 
-    public boolean isKeyPressed0(int keycode) {
+    public boolean isKeyPressed(int keycode) {
         int state = glfwGetKey(window, keycode);
         return state == GLFW_PRESS || state == GLFW_REPEAT;
     }
 
-    public boolean isKeyReleased0(int keycode) {
+    public boolean isKeyReleased(int keycode) {
         int state = glfwGetKey(window, keycode);
         return state == GLFW_RELEASE;
     }
 
-    public boolean isMouseButtonPressed0(int button) {
+    public boolean isMouseButtonPressed(int button) {
         int state = glfwGetMouseButton(window, button);
         return state == GLFW_PRESS;
     }
 
-    public boolean isMouseButtonReleased0(int button) {
+    public boolean isMouseButtonReleased(int button) {
         int state = glfwGetMouseButton(window, button);
         return state == GLFW_RELEASE;
     }
 
-    public float getMouseX0() {
+    public float getMouseX() {
         double[] x = new double[1], y = new double[1];
         glfwGetCursorPos(window, x, y);
         return (float)x[0];
     }
 
-    public float getMouseY0() {
+    public float getMouseY() {
         double[] x = new double[1], y = new double[1];
         glfwGetCursorPos(window, x, y);
         return (float)y[0];

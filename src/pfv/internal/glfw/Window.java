@@ -1,5 +1,8 @@
 package pfv.internal.glfw;
 
+import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
+import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_HIDDEN;
+import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_NORMAL;
 import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
 import static org.lwjgl.glfw.GLFW.GLFW_FLOATING;
 import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_DEBUG_CONTEXT;
@@ -13,10 +16,11 @@ import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
 import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
 import static org.lwjgl.glfw.GLFW.glfwGetPrimaryMonitor;
 import static org.lwjgl.glfw.GLFW.glfwGetVideoMode;
-import static org.lwjgl.glfw.GLFW.glfwInitHint;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
+import static org.lwjgl.glfw.GLFW.glfwSetCursorPos;
 import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetInputMode;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
@@ -28,7 +32,6 @@ import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
-import static org.lwjgl.opengl.GL43.glDebugMessageCallback;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -37,9 +40,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.glfw.GLFWVidMode;
-import org.lwjgl.opengl.GLDebugMessageCallbackI;
 import org.lwjgl.system.MemoryStack;
-import org.lwjgl.system.MemoryUtil;
 import pfv.internal.WindowProperties;
 import pfv.internal.event.EventCallback;
 import pfv.internal.event.application.WindowCloseEvent;
@@ -58,6 +59,7 @@ public class Window {
     private boolean vsync;
     private EventCallback eventCallback;
     private boolean pinnedToTop;
+    private boolean cursorVisible;
 
     @SuppressWarnings("resource")
     public Window(WindowProperties wp) {
@@ -114,6 +116,8 @@ public class Window {
         if(iconPath != null) {
             this.setIcon(iconPath);
         }
+
+        this.cursorVisible = true;
     }
 
     public void onUpdate() {
@@ -175,6 +179,24 @@ public class Window {
                 stbi_image_free(pixels32);
             }
         }
+    }
+
+    public void setCursorVisible(boolean flag) {
+        if(flag == this.cursorVisible) {
+            return;
+        }
+
+        if(!flag) {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+        } else {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        }
+
+        this.cursorVisible = flag;
+    }
+
+    public void setCursorPosition(double x, double y) {
+        glfwSetCursorPos(this.window, x, y);
     }
 
     public boolean isPinnedToTop() {
