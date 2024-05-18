@@ -37,9 +37,6 @@ public class Shader {
         glAttachShader(this.program, fragmentShader);
         glLinkProgram(this.program);
         this.bind();
-
-        System.out.println(glGetShaderInfoLog(vertexShader));
-        System.out.println(glGetShaderInfoLog(fragmentShader));
     }
 
     public void setMatrix4f(String name, Matrix4f matrix4f) {

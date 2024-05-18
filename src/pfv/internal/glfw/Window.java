@@ -32,6 +32,7 @@ import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
+import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -210,5 +211,9 @@ public class Window {
 
     public void dispose() {
         glfwDestroyWindow(this.window);
+    }
+
+    public boolean shouldClose() {
+        return glfwWindowShouldClose(this.window);
     }
 }

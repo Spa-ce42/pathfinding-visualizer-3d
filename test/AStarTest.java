@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.concurrent.TimeUnit;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
@@ -13,10 +14,13 @@ import pfv.Space;
 import pfv.internal.WindowProperties;
 import pfv.internal.render.CubeRenderer;
 
-public class Test2 extends PFV {
+public class AStarTest extends PFV {
     @Override
     public void onAttach() {
         super.space = new Space(new File("beesetup3.txt"));
+        super.camera.setYaw((float)(Math.PI / 4));
+        super.camera.setPosition(-10, 30, -10);
+        super.camera.updateCameraVectors();
     }
 
     @Override
@@ -46,10 +50,7 @@ public class Test2 extends PFV {
 
     private List<Vector3i> fullPath;
 
-    @Override
-    public void run() {
-        Vector3i start = this.space.starts().getFirst();
-        Vector3i end = this.space.ends().getFirst();
+    private void pathFind(Vector3i start, Vector3i end) {
         PriorityQueue<PointInformation> openSet = new PriorityQueue<>();
         openSet.add(new PointInformation(start, start, end));
         HashMap<Vector3i, Vector3i> cameFrom = new HashMap<>();
@@ -65,13 +66,13 @@ public class Test2 extends PFV {
             CubeRenderer.begin(this.camera);
 
             for(Vector3i v : reconstructPath(cameFrom, point)) {
-                CubeRenderer.drawCube(new Vector3f(1, 1, 1), new Matrix4f().translate(v.x, v.y, v.z));
+                CubeRenderer.drawCube(new Vector3f(0, 0, 1), new Matrix4f().translate(v.x, v.y, v.z));
             }
 
             CubeRenderer.end();
             end();
 
-            delay(25);
+            delay(40);
 
             if(point.equals(end)) {
                 this.fullPath = this.reconstructPath(cameFrom, point);
@@ -80,6 +81,11 @@ public class Test2 extends PFV {
 
             closedSet.add(point);
             for(Vector3i neighbor : space.getNeighbors(point)) {
+                begin();
+                CubeRenderer.begin(this.camera);
+                CubeRenderer.drawCube(new Vector3f(0, 1, 0), new Matrix4f().translate(neighbor.x, neighbor.y, neighbor.z));
+                CubeRenderer.end();
+                end();
                 if(closedSet.contains(neighbor)) {
                     continue;
                 }
@@ -99,18 +105,35 @@ public class Test2 extends PFV {
     }
 
     @Override
+    public void run() {
+        List<Vector3i> starts = this.space.starts();
+        List<Vector3i> ends = this.space.ends();
+
+        for(int i = 0, n = starts.size(); i < n; ++i) {
+            pathFind(starts.get(i), ends.get(i));
+
+            long goal = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(1000);
+            while(System.nanoTime() < goal) {
+                begin();
+                this.stable();
+                end();
+            }
+        }
+    }
+
+    @Override
     public void stable() {
         CubeRenderer.begin(super.camera);
 
         for(Vector3i v : this.fullPath) {
-            CubeRenderer.drawCube(new Vector3f(1, 1, 1), new Matrix4f().translate(v.x, v.y, v.z));
+            CubeRenderer.drawCube(new Vector3f(0, 1, 0), new Matrix4f().translate(v.x, v.y, v.z));
         }
 
         CubeRenderer.end();
     }
 
     public static void main(String[] args) {
-        PFV pfv = new Test2();
+        PFV pfv = new AStarTest();
         WindowProperties wp = new WindowProperties();
         wp.setWidth(1280 * 2);
         wp.setHeight(720 * 2);

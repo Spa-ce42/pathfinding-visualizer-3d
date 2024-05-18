@@ -24,21 +24,21 @@ import org.joml.Vector3i;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryUtil;
 import pfv.Space;
-import pfv.internal.PerspectiveCamera;
-import pfv.internal.event.EventType;
-import pfv.internal.event.key.KeyPressedEvent;
-import pfv.internal.event.key.KeyReleasedEvent;
-import pfv.internal.render.CubeRenderer;
 import pfv.internal.Layer;
-import pfv.internal.render.LineRenderer;
+import pfv.internal.PerspectiveCamera;
 import pfv.internal.WindowProperties;
 import pfv.internal.event.Event;
 import pfv.internal.event.EventDispatcher;
 import pfv.internal.event.EventHandler;
+import pfv.internal.event.EventType;
 import pfv.internal.event.Input;
 import pfv.internal.event.application.WindowCloseEvent;
 import pfv.internal.event.application.WindowResizeEvent;
+import pfv.internal.event.key.KeyPressedEvent;
+import pfv.internal.event.key.KeyReleasedEvent;
 import pfv.internal.glfw.Window;
+import pfv.internal.render.CubeRenderer;
+import pfv.internal.render.LineRenderer;
 import pfv.internal.render.PointRenderer;
 
 public abstract class PFV implements Layer {
@@ -131,13 +131,13 @@ public abstract class PFV implements Layer {
         this.minimized = false;
         this.windowCloseHandler = new EventHandler<>(WINDOW_CLOSE, this::onWindowClose);
         this.windowResizeHandler = new EventHandler<>(WINDOW_RESIZE, this::onWindowResize);
-        this.onAttach();
         window = this.getWindow();
         window.setCursorVisible(false);
         window.setCursorPosition(window.getWidth() / 2f, window.getHeight() / 2f);
 
         glEnable(GL_DEPTH_TEST);
         this.camera = new PerspectiveCamera((float)this.window.getWidth() / (float)this.window.getHeight());
+        this.onAttach();
 
         CubeRenderer.initialize(100000);
         LineRenderer.initialize(100);
@@ -209,7 +209,13 @@ public abstract class PFV implements Layer {
         long goal = System.nanoTime() + delayMillis * 1000000;
         while((current = System.nanoTime()) < goal) {
             glfwPollEvents();
-            processInput((float)(current - last) / 1000000);
+
+            if(this.window.shouldClose()) {
+                System.exit(0);
+            }
+/*
+            processInput((float)(current - last) / 1000000);*/
+            last = current;
         }
     }
 
@@ -220,7 +226,7 @@ public abstract class PFV implements Layer {
         CubeRenderer.begin(camera);
 
         for(Vector3i v : this.space.ends()) {
-            CubeRenderer.drawCube(new Vector3f(0.2f, 0.8f, 0.3f), new Matrix4f().translate(v.x, v.y, v.z));
+            CubeRenderer.drawCube(new Vector3f(0.1f, 0.4f, 0.15f), new Matrix4f().translate(v.x, v.y, v.z));
         }
 
         for(Vector3i v : this.space.starts()) {
