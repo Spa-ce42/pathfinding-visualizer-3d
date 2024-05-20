@@ -6,6 +6,9 @@ import static pfv.internal.event.EventType.APP_UPDATE;
 import pfv.internal.event.Event;
 import pfv.internal.event.EventType;
 
+/**
+ * The type App update event.
+ */
 public class AppUpdateEvent extends Event {
     @Override
     public EventType getEventType() {

@@ -19,6 +19,9 @@ import pfv.internal.opengl.Shader;
 import pfv.internal.opengl.VertexArray;
 import pfv.internal.opengl.VertexBuffer;
 
+/**
+ * The type Point renderer.
+ */
 public class PointRenderer {
     private static Shader shader;
     private static boolean initialized;
@@ -33,6 +36,11 @@ public class PointRenderer {
     private static VertexArray va;
     private static PerspectiveCamera pc;
 
+    /**
+     * Initialize.
+     *
+     * @param count the count
+     */
     public static void initialize(int count) {
         if(initialized) {
             shader.dispose();
@@ -97,6 +105,11 @@ public class PointRenderer {
         initialized = true;
     }
 
+    /**
+     * Begin.
+     *
+     * @param pc the pc
+     */
     public static void begin(PerspectiveCamera pc) {
         PointRenderer.pc = pc;
         colorsPointer = 0;
@@ -104,6 +117,12 @@ public class PointRenderer {
         count = 0;
     }
 
+    /**
+     * Draw point.
+     *
+     * @param color the color
+     * @param pos   the pos
+     */
     public static void drawPoint(Vector3f color, Vector3f pos) {
         if(count >= maxCount) {
             end();
@@ -117,6 +136,9 @@ public class PointRenderer {
         ++count;
     }
 
+    /**
+     * End.
+     */
     public static void end() {
         shader.bind();
         shader.setMatrix4f("u_View", pc.getView());

@@ -53,6 +53,9 @@ import pfv.internal.event.mouse.MouseButtonReleasedEvent;
 import pfv.internal.event.mouse.MouseMovedEvent;
 import pfv.internal.event.mouse.MouseScrolledEvent;
 
+/**
+ * The type Window.
+ */
 public class Window {
     private final long window;
     private String title;
@@ -62,6 +65,11 @@ public class Window {
     private boolean pinnedToTop;
     private boolean cursorVisible;
 
+    /**
+     * Instantiates a new Window.
+     *
+     * @param wp the wp
+     */
     @SuppressWarnings("resource")
     public Window(WindowProperties wp) {
         this.title = wp.getTitle();
@@ -121,36 +129,74 @@ public class Window {
         this.cursorVisible = true;
     }
 
+    /**
+     * On update.
+     */
     public void onUpdate() {
         glfwPollEvents();
         glfwSwapBuffers(this.window);
     }
 
+    /**
+     * Sets event callback.
+     *
+     * @param eventCallback the event callback
+     */
     public void setEventCallback(EventCallback eventCallback) {
         this.eventCallback = eventCallback;
     }
 
+    /**
+     * Gets title.
+     *
+     * @return the title
+     */
     public String getTitle() {
         return this.title;
     }
 
+    /**
+     * Sets title.
+     *
+     * @param title the title
+     */
     public void setTitle(String title) {
         this.title = title;
         glfwSetWindowTitle(this.window, title);
     }
 
+    /**
+     * Gets width.
+     *
+     * @return the width
+     */
     public int getWidth() {
         return this.width;
     }
 
+    /**
+     * Gets height.
+     *
+     * @return the height
+     */
     public int getHeight() {
         return this.height;
     }
 
+    /**
+     * Is vsync boolean.
+     *
+     * @return the boolean
+     */
     public boolean isVsync() {
         return this.vsync;
     }
 
+    /**
+     * Sets vsync.
+     *
+     * @param enabled the enabled
+     */
     public void setVsync(boolean enabled) {
         this.vsync = enabled;
 
@@ -162,10 +208,20 @@ public class Window {
         glfwSwapInterval(0);
     }
 
+    /**
+     * Gets native window.
+     *
+     * @return the native window
+     */
     public long getNativeWindow() {
         return this.window;
     }
 
+    /**
+     * Sets icon.
+     *
+     * @param path the path
+     */
     public void setIcon(String path) {
         try(MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer w = stack.mallocInt(1);
@@ -182,6 +238,11 @@ public class Window {
         }
     }
 
+    /**
+     * Sets cursor visible.
+     *
+     * @param flag the flag
+     */
     public void setCursorVisible(boolean flag) {
         if(flag == this.cursorVisible) {
             return;
@@ -196,23 +257,47 @@ public class Window {
         this.cursorVisible = flag;
     }
 
+    /**
+     * Sets cursor position.
+     *
+     * @param x the x
+     * @param y the y
+     */
     public void setCursorPosition(double x, double y) {
         glfwSetCursorPos(this.window, x, y);
     }
 
+    /**
+     * Is pinned to top boolean.
+     *
+     * @return the boolean
+     */
     public boolean isPinnedToTop() {
         return this.pinnedToTop;
     }
 
+    /**
+     * Sets pinned to top.
+     *
+     * @param flag the flag
+     */
     public void setPinnedToTop(boolean flag) {
         this.pinnedToTop = flag;
         glfwSetWindowAttrib(this.window, GLFW_FLOATING, flag ? GLFW_TRUE : GLFW_FALSE);
     }
 
+    /**
+     * Dispose.
+     */
     public void dispose() {
         glfwDestroyWindow(this.window);
     }
 
+    /**
+     * Should close boolean.
+     *
+     * @return the boolean
+     */
     public boolean shouldClose() {
         return glfwWindowShouldClose(this.window);
     }

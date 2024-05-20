@@ -18,6 +18,9 @@ import pfv.internal.opengl.Shader;
 import pfv.internal.opengl.VertexArray;
 import pfv.internal.opengl.VertexBuffer;
 
+/**
+ * The type Line renderer.
+ */
 public class LineRenderer {
     private static Shader shader;
     private static boolean initialized;
@@ -32,6 +35,11 @@ public class LineRenderer {
     private static VertexArray va;
     private static PerspectiveCamera pc;
 
+    /**
+     * Initialize.
+     *
+     * @param count the count
+     */
     public static void initialize(int count) {
         if(initialized) {
             shader.dispose();
@@ -105,6 +113,11 @@ public class LineRenderer {
         initialized = true;
     }
 
+    /**
+     * Begin.
+     *
+     * @param pc the pc
+     */
     public static void begin(PerspectiveCamera pc) {
         LineRenderer.pc = pc;
         colorsPointer = 0;
@@ -112,6 +125,13 @@ public class LineRenderer {
         count = 0;
     }
 
+    /**
+     * Draw line.
+     *
+     * @param color the color
+     * @param start the start
+     * @param end   the end
+     */
     public static void drawLine(Vector3f color, Vector3f start, Vector3f end) {
         if(count >= maxCount) {
             end();
@@ -127,6 +147,9 @@ public class LineRenderer {
         ++count;
     }
 
+    /**
+     * End.
+     */
     public static void end() {
         shader.bind();
         shader.setMatrix4f("u_View", pc.getView());

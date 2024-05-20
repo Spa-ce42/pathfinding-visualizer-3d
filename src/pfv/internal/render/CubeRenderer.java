@@ -19,6 +19,9 @@ import pfv.internal.opengl.Shader;
 import pfv.internal.opengl.VertexArray;
 import pfv.internal.opengl.VertexBuffer;
 
+/**
+ * The type Cube renderer.
+ */
 public class CubeRenderer {
     private static Shader shader;
     private static boolean initialized;
@@ -33,6 +36,11 @@ public class CubeRenderer {
     private static VertexArray va;
     private static PerspectiveCamera pc;
 
+    /**
+     * Initialize.
+     *
+     * @param count the count
+     */
     public static void initialize(int count) {
         if(initialized) {
             shader.dispose();
@@ -139,6 +147,11 @@ public class CubeRenderer {
         initialized = true;
     }
 
+    /**
+     * Begin.
+     *
+     * @param pc the pc
+     */
     public static void begin(PerspectiveCamera pc) {
         CubeRenderer.pc = pc;
         colorsPointer = 0;
@@ -146,6 +159,12 @@ public class CubeRenderer {
         count = 0;
     }
 
+    /**
+     * Draw cube.
+     *
+     * @param color          the color
+     * @param transformation the transformation
+     */
     public static void drawCube(Vector3f color, Matrix4f transformation) {
         if(count >= maxCount) {
             end();
@@ -159,6 +178,9 @@ public class CubeRenderer {
         ++count;
     }
 
+    /**
+     * End.
+     */
     public static void end() {
         shader.bind();
         shader.setMatrix4f("u_View", pc.getView());

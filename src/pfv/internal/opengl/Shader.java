@@ -19,9 +19,18 @@ import static org.lwjgl.opengl.GL20.glUseProgram;
 import org.joml.Matrix4f;
 import org.lwjgl.system.MemoryStack;
 
+/**
+ * The type Shader.
+ */
 public class Shader {
     private final int program;
 
+    /**
+     * Instantiates a new Shader.
+     *
+     * @param vss the vss
+     * @param fss the fss
+     */
     public Shader(String vss, String fss) {
         this.program = glCreateProgram();
         int vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -39,6 +48,12 @@ public class Shader {
         this.bind();
     }
 
+    /**
+     * Sets matrix 4 f.
+     *
+     * @param name     the name
+     * @param matrix4f the matrix 4 f
+     */
     public void setMatrix4f(String name, Matrix4f matrix4f) {
         int l = glGetUniformLocation(this.program, name);
         try(MemoryStack stack = MemoryStack.stackPush()) {
@@ -46,14 +61,23 @@ public class Shader {
         }
     }
 
+    /**
+     * Bind.
+     */
     public void bind() {
         glUseProgram(this.program);
     }
 
+    /**
+     * Unbind.
+     */
     public void unbind() {
         glUseProgram(0);
     }
 
+    /**
+     * Dispose.
+     */
     public void dispose() {
         glDeleteProgram(this.program);
     }

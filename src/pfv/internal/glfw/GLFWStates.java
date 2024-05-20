@@ -5,6 +5,9 @@ import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
 
 import org.lwjgl.system.MemoryUtil;
 
+/**
+ * The type Glfw states.
+ */
 public class GLFWStates {
     private static boolean initialized;
 
@@ -12,6 +15,9 @@ public class GLFWStates {
         throw new AssertionError();
     }
 
+    /**
+     * Initialize.
+     */
     public static void initialize() {
         if(initialized) {
             return;

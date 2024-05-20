@@ -41,18 +41,50 @@ import pfv.internal.render.CubeRenderer;
 import pfv.internal.render.LineRenderer;
 import pfv.internal.render.PointRenderer;
 
+/**
+ * To use the PFV class, create a subclass that implements the abstract methods onAttach, onDetach,
+ * and the Layer interface methods. Initialize the application by calling the initialize method and
+ * start it by calling the start method.
+ */
 public abstract class PFV implements Layer {
+    /**
+     * The window instance for the application
+     */
     private Window window;
+    /**
+     * Indicates if the application is running
+     */
     private boolean running;
+    /**
+     * Stores the time of the last frame.
+     */
     private long lastFrameTime;
+    /**
+     * Indicates if the window is minimized
+     */
     private boolean minimized;
+    /**
+     * Handler for window close events.
+     */
     private EventHandler<WindowCloseEvent> windowCloseHandler;
+    /**
+     * Handler for window resize events.
+     */
     private EventHandler<WindowResizeEvent> windowResizeHandler;
+    /**
+     * The camera used in the application.
+     */
     protected PerspectiveCamera camera;
+    /**
+     * The space object representing the 3D environment
+     */
     protected Space space;
     private float cursorPosX;
     private float cursorPosY;
 
+    /**
+     * Instantiates a new Pfv.
+     */
     public PFV() {
 
     }
@@ -108,6 +140,9 @@ public abstract class PFV implements Layer {
         }
     }
 
+    /**
+     * Initialize.
+     */
     public void initialize() {
         WindowProperties wp = new WindowProperties();
         wp.setWidth(1280);
@@ -116,6 +151,11 @@ public abstract class PFV implements Layer {
         this.initialize(wp);
     }
 
+    /**
+     * Initialize.
+     *
+     * @param wp the wp
+     */
     public void initialize(WindowProperties wp) {
         this.window = new Window(wp);
         GL.createCapabilities();
@@ -144,6 +184,11 @@ public abstract class PFV implements Layer {
         PointRenderer.initialize(10000);
     }
 
+    /**
+     * Space.
+     *
+     * @param f the f
+     */
     public void space(File f) {
         this.space = new Space(f);
     }
@@ -162,9 +207,9 @@ public abstract class PFV implements Layer {
             float cpxo = cursorPosX - window.getWidth() / 2f;
             float cpyo = cursorPosY - window.getHeight() / 2f;
 
-            camera.addYaw(cpxo * ts * 0.001f);
+            camera.addYaw(cpxo * ts * 0.0001f);
             float p = camera.getPitch();
-            float fp = p - cpyo * ts * 0.001f;
+            float fp = p - cpyo * ts * 0.0001f;
             if(Math.abs(fp) >= Math.PI / 2) {
                 if(fp > 0) {
                     fp = (float)(Math.PI / 2) - Math.ulp((float)(Math.PI / 2));
@@ -203,6 +248,11 @@ public abstract class PFV implements Layer {
         }
     }
 
+    /**
+     * Delay.
+     *
+     * @param delayMillis the delay millis
+     */
     public void delay(long delayMillis) {
         long last = System.nanoTime();
         long current;
@@ -257,20 +307,26 @@ public abstract class PFV implements Layer {
         LineRenderer.end();
     }
 
+    /**
+     * Begin.
+     */
     public void begin() {
         long time = System.nanoTime();
         float ts = (time - this.lastFrameTime) / 1000000f;
         this.lastFrameTime = time;
-
-        if(!this.minimized) {
-            this.onUpdate(ts);
-        }
+        this.onUpdate(ts);
     }
 
+    /**
+     * End.
+     */
     public void end() {
         this.window.onUpdate();
     }
 
+    /**
+     * Start.
+     */
     public void start() {
         this.lastFrameTime = System.nanoTime();
         this.run();
@@ -285,10 +341,20 @@ public abstract class PFV implements Layer {
         this.window.dispose();
     }
 
+    /**
+     * Gets window.
+     *
+     * @return the window
+     */
     public Window getWindow() {
         return this.window;
     }
 
+    /**
+     * Sets running.
+     *
+     * @param b the b
+     */
     public void setRunning(boolean b) {
         this.running = b;
     }

@@ -6,6 +6,9 @@ import static pfv.internal.event.EventType.APP_RENDER;
 import pfv.internal.event.Event;
 import pfv.internal.event.EventType;
 
+/**
+ * The type App render event.
+ */
 public class AppRenderEvent extends Event {
     @Override
     public EventType getEventType() {
